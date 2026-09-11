@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.modules.train.train_routes import router as train_router
 from src.modules.eta.eta_routes import router as eta_router
-
+from src.modules.simulation.simulation_routes import router as simulation_router
 
 app = FastAPI(
     title="Dynamic Train ETA Backend",
@@ -23,6 +23,7 @@ app.add_middleware(
 
 app.include_router(train_router)
 app.include_router(eta_router)
+app.include_router(simulation_router)
 
 
 @app.get("/")
