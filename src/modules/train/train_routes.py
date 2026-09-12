@@ -33,6 +33,26 @@ def get_trains():
         "trains": trains
     }
 
+@router.get("/real")
+def get_real_trains():
+    """
+    Get real train directory from RailRadar.
+    """
+
+    try:
+        data = train_repository.get_real_trains()
+
+        return {
+            "status": "success",
+            "trains": data
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Unable to fetch real train directory: {str(e)}"
+        )
+
 
 @router.get("/{train_number}/live")
 def get_live_train(train_number: str):
@@ -62,6 +82,8 @@ def get_live_train(train_number: str):
             status_code=502,
             detail=f"Unable to fetch live train data: {str(e)}"
         )
+
+
 
 
 @router.get("/{train_number}")

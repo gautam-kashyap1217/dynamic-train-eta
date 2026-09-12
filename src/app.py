@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.modules.train.train_routes import router as train_router
 from src.modules.eta.eta_routes import router as eta_router
 from src.modules.station.station_routes import router as station_router
+from src.modules.congestion.congestion_routes import (
+    router as congestion_router
+)
 
 
 app = FastAPI(
@@ -25,7 +28,7 @@ app.add_middleware(
 app.include_router(train_router)
 app.include_router(eta_router)
 app.include_router(station_router)
-
+app.include_router(congestion_router)
 
 @app.get("/")
 def root():

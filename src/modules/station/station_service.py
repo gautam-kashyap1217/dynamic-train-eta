@@ -12,5 +12,8 @@ class StationService:
     def get_station_by_code(self, station_code: str):
         return station_repository.get_station_by_code(station_code)
 
+    def search_stations_by_name(self, name: str):
+        return station_repository.search_stations_by_name(name)
+
 
 station_service = StationService()

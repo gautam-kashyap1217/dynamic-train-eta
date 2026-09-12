@@ -1,7 +1,5 @@
 from fastapi import APIRouter, HTTPException
-
 from src.modules.station.station_service import station_service
-
 
 router = APIRouter(
     prefix="/api/v1/stations",
@@ -11,11 +9,18 @@ router = APIRouter(
 
 @router.get("/")
 def get_stations():
-    """
-    Get all stations.
-    """
-
     stations = station_service.get_all_stations()
+
+    return {
+        "status": "success",
+        "count": len(stations),
+        "stations": stations
+    }
+
+
+@router.get("/search")
+def search_stations(name: str = ""):
+    stations = station_service.search_stations_by_name(name)
 
     return {
         "status": "success",
@@ -26,10 +31,6 @@ def get_stations():
 
 @router.get("/{station_code}")
 def get_station(station_code: str):
-    """
-    Get station details by station code.
-    """
-
     station = station_service.get_station_by_code(station_code)
 
     if station is None:
