@@ -13,7 +13,7 @@ class TrainService:
 
         if query:
             filtered = df[
-                df["train_id"].str.contains(
+                df["train_id"].astype(str).str.contains(
                     query,
                     case=False,
                     na=False
@@ -26,7 +26,27 @@ class TrainService:
 
     def get_train_mapping(self, train_id: str):
 
-        return TRAIN_MAPPING.get(train_id)
+        train_id = str(train_id).strip()
+
+        # Check whether the provided value is an internal train ID.
+        mapping = TRAIN_MAPPING.get(train_id)
+
+        if mapping:
+            return {
+                **mapping,
+                "train_id": train_id,
+            }
+
+        # If not found, check whether it is a train number.
+        for internal_id, train_info in TRAIN_MAPPING.items():
+
+            if str(train_info.get("train_number")).strip() == train_id:
+                return {
+                    **train_info,
+                    "train_id": internal_id,
+                }
+
+        return None
 
     def get_train_schedule(self, train_id: str):
 

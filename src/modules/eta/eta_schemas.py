@@ -4,10 +4,9 @@ from pydantic import BaseModel, Field
 
 
 class ETARequest(BaseModel):
-
     train_id: str = Field(
         ...,
-        description="Internal system train ID, e.g. trn10039"
+        description="Internal system train ID, e.g. TRN10000"
     )
 
     train_number: Optional[str] = Field(
@@ -35,6 +34,10 @@ class ETAResponse(BaseModel):
     p10: float
     p50: float
     p90: float
+
+    # Early arrival and delay margins
+    can_arrive_earlier_by: float = 0.0
+    can_be_delayed_by: float = 0.0
 
     # Scheduled vs predicted arrival
     scheduled_arrival: Optional[str] = None

@@ -47,9 +47,8 @@ class SimulationService:
             progress_percent=0.0,
 
             # Initial delay.
-            # Positive = late
-            # Negative = early
-            current_delay_min=-10.0
+            # The simulation starts on time.
+            current_delay_min=0.0
         )
 
         return self.set_train_state(state)
@@ -80,15 +79,12 @@ class SimulationService:
         distance_km = float(segment["distance_km"])
         base_speed_kmph = float(segment["average_speed_kmph"])
 
+        if distance_km <= 0:
+            raise ValueError("Invalid segment distance.")
+
         # ---------------------------------------------------------
         # SIMULATED SPEED
         # ---------------------------------------------------------
-        #
-        # Different speed phases make the simulation dynamic.
-        #
-        # Faster than normal -> train recovers delay
-        # Slower than normal -> train gains delay
-        #
 
         progress = state.progress_percent
 
@@ -124,24 +120,8 @@ class SimulationService:
         # DELAY UPDATE
         # ---------------------------------------------------------
         #
-        # Prototype-friendly delay behaviour:
-        #
-        # First part:
-        #   Train is faster -> delay decreases quickly.
-        #
-        # Middle part:
-        #   Train continues recovering delay.
-        #
-        # Later part:
-        #   Train becomes slower -> delay can increase again.
-        #
-        # This allows the frontend to demonstrate:
-        #
-        #   +10 min  -> Late
-        #   +5 min   -> Late
-        #    0 min   -> On Time
-        #   -5 min   -> Early
-        #   -10 min  -> Early
+        # The simulation allows delay recovery, but delay can
+        # never become negative.
         #
 
         if progress < 25:
@@ -158,12 +138,17 @@ class SimulationService:
             * (elapsed_seconds / 3.0)
         )
 
-        new_delay = state.current_delay_min + delay_change
+        current_delay = max(
+            float(state.current_delay_min),
+            0.0
+        )
 
-        # Keep the prototype delay within a sensible range.
+        new_delay = current_delay + delay_change
+
+        # Keep delay within the range 0 to 30 minutes.
         new_delay = max(
             min(new_delay, 30.0),
-            -15.0
+            0.0
         )
 
         # ---------------------------------------------------------
@@ -220,7 +205,6 @@ class SimulationService:
         """Continuously advance a simulated train."""
 
         while train_number in self.trains:
-
             self.advance_train(
                 train_number,
                 elapsed_seconds=interval_seconds

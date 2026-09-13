@@ -1,7 +1,7 @@
-
 from fastapi import APIRouter, HTTPException
 
 from src.core.database import db
+from src.integrations.railway.railradar_client import railradar_client
 
 
 router = APIRouter(
@@ -83,3 +83,31 @@ def get_train(train_number: str):
         "train": result.to_dict(orient="records")
     }
 
+
+@router.get("/{train_number}/live-status")
+def get_live_train_status(train_number: str):
+    """
+    Get live train status from RailRadar API.
+    """
+
+    try:
+        result = railradar_client.get_live_train_status(
+            train_number
+        )
+
+        if not result or not result.get("success"):
+            raise HTTPException(
+                status_code=404,
+                detail=f"Live status not available for train {train_number}"
+            )
+
+        return result
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch live train status: {str(e)}"
+        )

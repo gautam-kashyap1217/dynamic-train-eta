@@ -1,29 +1,98 @@
 import joblib
+import numpy as np
 import pandas as pd
-from src.config.paths import ETA_MODEL_PATH
+
+from pathlib import Path
+
+
+MODEL_DIR = Path(__file__).resolve().parent / "models"
+
 
 class InferenceEngine:
-    """Loads the pre-trained LightGBM joblib model artifact and executes quantile delay predictions."""
-    
     def __init__(self):
-        self.model = None
-        self._load_model()
+        self.base_artifact = None
+        self.quantile_artifact = None
 
-    def _load_model(self):
-        if ETA_MODEL_PATH.exists():
-            try:
-                self.model = joblib.load(ETA_MODEL_PATH)
-            except Exception as e:
-                print(f"Warning: Could not load model artifact: {e}")
+        self.base_model = None
+        self.quantile_model = None
 
-    def predict_eta_quantiles(self, features_df: pd.DataFrame) -> dict:
-        """Returns P10, P50, and P90 quantile arrival forecasts."""
-        if self.model is None:
-            # Fallback mock predictions if model artifact isn't compiled yet
-            return {"p10": 10.0, "p50": 15.0, "p90": 25.0}
-        
-        # Real inference call when model artifact is present
-        predictions = self.model.predict(features_df)
-        return {"p10": float(predictions[0][0]), "p50": float(predictions[0][1]), "p90": float(predictions[0][2])}
+        self.base_preprocessor = None
+        self.quantile_preprocessor = None
+
+        self.feature_columns = []
+
+        self._load_models()
+
+    def _load_models(self):
+        base_path = MODEL_DIR / "final_eta_model.joblib"
+        quantile_path = MODEL_DIR / "rf_quantile_models.joblib"
+
+        if not base_path.exists():
+            raise FileNotFoundError(
+                f"Base ETA model not found: {base_path}"
+            )
+
+        if not quantile_path.exists():
+            raise FileNotFoundError(
+                f"Quantile ETA model not found: {quantile_path}"
+            )
+
+        self.base_artifact = joblib.load(base_path)
+        self.quantile_artifact = joblib.load(quantile_path)
+
+        self.base_model = self.base_artifact["final_base_model"]
+        self.base_preprocessor = self.base_artifact["preprocessor"]
+
+        self.quantile_model = self.quantile_artifact["final_model"]
+        self.quantile_preprocessor = self.quantile_artifact["preprocessor"]
+
+        self.feature_columns = self.base_artifact["feature_columns"]
+
+        print("ETA models loaded successfully.")
+        print(f"Expected features: {len(self.feature_columns)}")
+
+    def predict(self, features_df: pd.DataFrame) -> dict:
+        """
+        Generate P10, P50, and P90 ETA predictions.
+
+        The quantile model is a RandomForestRegressor.
+        Quantiles are calculated from predictions of its 300 individual trees.
+        """
+
+        if features_df is None or features_df.empty:
+            raise ValueError("Feature data cannot be empty.")
+
+        missing_features = [
+            feature
+            for feature in self.feature_columns
+            if feature not in features_df.columns
+        ]
+
+        if missing_features:
+            raise ValueError(
+                f"Missing model features: {missing_features}"
+            )
+
+        features_df = features_df[self.feature_columns].copy()
+
+        processed_features = self.quantile_preprocessor.transform(
+            features_df
+        )
+
+        tree_predictions = np.array([
+            tree.predict(processed_features)[0]
+            for tree in self.quantile_model.estimators_
+        ])
+
+        p10 = np.quantile(tree_predictions, 0.10)
+        p50 = np.quantile(tree_predictions, 0.50)
+        p90 = np.quantile(tree_predictions, 0.90)
+
+        return {
+            "p10": round(float(p10), 2),
+            "p50": round(float(p50), 2),
+            "p90": round(float(p90), 2)
+        }
+
 
 inference_engine = InferenceEngine()

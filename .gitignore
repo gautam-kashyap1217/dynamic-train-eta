@@ -3,24 +3,27 @@ __pycache__/
 *.py[cod]
 *.pyo
 
-# Virtual environment
+# Virtual environments
 .venv/
+.venv311/
 venv/
 env/
 
-# Environment variables
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
 
 # SQLite databases
 *.db
 *.sqlite
 *.sqlite3
 
-# IDE
+# IDE and editor files
 .vscode/
 .idea/
 
-# OS
+# Operating system files
 .DS_Store
 Thumbs.db
 
@@ -30,11 +33,32 @@ Thumbs.db
 # Python tooling
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
 
 # Jupyter
 .ipynb_checkpoints/
 
-# SQLite database
-*.db
-*.sqlite
-*.sqlite3
+# Build and distribution files
+build/
+dist/
+*.egg-info/
+
+# Node.js / Frontend dependencies
+node_modules/
+frontend/node_modules/
+
+# Frontend build output
+frontend/dist/
+frontend/build/
+
+# Local coverage reports
+.coverage
+htmlcov/
+.coverage.*
+.pytest_cache/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
