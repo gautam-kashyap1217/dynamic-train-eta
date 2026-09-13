@@ -1,0 +1,299 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "ADI",
+        "station_name": "Ahmedabad Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.5714,
+          23.0225
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "AGC",
+        "station_name": "Agra Cantt"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.9914,
+          27.1591
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "BPL",
+        "station_name": "Bhopal Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.4116,
+          23.2662
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "BRC",
+        "station_name": "Vadodara Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.1812,
+          22.3107
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "CNB",
+        "station_name": "Kanpur Central"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.3512,
+          26.4537
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "CSMT",
+        "station_name": "Mumbai CSMT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.8355,
+          18.9401
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "DDU",
+        "station_name": "Pt. Deen Dayal Upadhyaya Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          83.1194,
+          25.2818
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "ET",
+        "station_name": "Itarsi Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.7644,
+          22.612
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "GAYA",
+        "station_name": "Gaya Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          84.9996,
+          24.808
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "GWL",
+        "station_name": "Gwalior Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.1828,
+          26.2183
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "HBD",
+        "station_name": "Hoshangabad"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.7289,
+          22.7519
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "HWH",
+        "station_name": "Howrah Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.3426,
+          22.5839
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "INDB",
+        "station_name": "Indore Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          75.8577,
+          22.7196
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "JBP",
+        "station_name": "Jabalpur"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.9482,
+          23.1645
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "KOTA",
+        "station_name": "Kota Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          75.8648,
+          25.2138
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "LKO",
+        "station_name": "Lucknow Charbagh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.9238,
+          26.8322
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "NDLS",
+        "station_name": "New Delhi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.2195,
+          28.6424
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "NGP",
+        "station_name": "Nagpur Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.0888,
+          21.1526
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "PUNE",
+        "station_name": "Pune Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8744,
+          18.5289
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "RTM",
+        "station_name": "Ratlam Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          75.0416,
+          23.3441
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_code": "VGLB",
+        "station_name": "Virangana Lakshmibai Jhansi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.5685,
+          25.4484
+        ]
+      }
+    }
+  ]
+}

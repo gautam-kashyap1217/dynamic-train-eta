@@ -3,14 +3,19 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.modules.train.train_routes import router as train_router
 from src.modules.eta.eta_routes import router as eta_router
-
+from src.modules.simulation.simulation_routes import (
+    router as simulation_router
+)
+from src.modules.station.station_routes import router as station_router
+from src.modules.congestion.congestion_routes import (
+    router as congestion_router
+)
 
 app = FastAPI(
     title="Dynamic Train ETA Backend",
     description="Backend API for Dynamic Train ETA Forecasting System",
     version="1.0.0"
 )
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,9 +25,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 app.include_router(train_router)
 app.include_router(eta_router)
+app.include_router(simulation_router)
+app.include_router(station_router)
+app.include_router(congestion_router)
 
 
 @app.get("/")
@@ -39,4 +46,3 @@ def health_check():
         "status_code": 200,
         "status": "healthy"
     }
-        
