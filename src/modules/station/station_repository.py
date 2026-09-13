@@ -35,6 +35,20 @@ class StationRepository:
 
         return self._station_names_df
 
+    def search_stations_by_name(self, name: str):
+        stations = self.get_all_stations()
+
+        if not name:
+            return stations
+
+        name = name.strip().lower()
+
+        return [
+            station
+            for station in stations
+            if name in station["station_name"].lower()
+        ]
+
     def _load_geojson(self):
         if self._geojson_data is None:
 

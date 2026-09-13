@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from src.core.database import db
 from src.integrations.railway.railradar_client import railradar_client
+from src.modules.train.train_repository import train_repository
 
 
 router = APIRouter(
@@ -34,6 +35,57 @@ def get_trains():
     }
 
 
+@router.get("/real")
+def get_real_trains():
+    """
+    Get real train directory from RailRadar.
+    """
+
+    try:
+        data = train_repository.get_real_trains()
+
+        return {
+            "status": "success",
+            "trains": data
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Unable to fetch real train directory: {str(e)}"
+        )
+
+
+@router.get("/{train_number}/live")
+def get_live_train(train_number: str):
+    """
+    Get real-time live status of a train from RailRadar.
+    """
+
+    try:
+        data = train_repository.get_live_train_status(train_number)
+
+        if data is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Live data not available for train {train_number}"
+            )
+
+        return {
+            "status": "success",
+            "train": data
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Unable to fetch live train data: {str(e)}"
+        )
+
+
 @router.get("/{train_number}")
 def get_train(train_number: str):
     """
@@ -48,8 +100,6 @@ def get_train(train_number: str):
             detail="Train data not available"
         )
 
-    # Convert train number to string so CSV values like
-    # 12345.0 don't cause matching problems.
     train_column = None
 
     for column in df.columns:
@@ -69,7 +119,8 @@ def get_train(train_number: str):
         )
 
     result = df[
-        df[train_column].astype(str).str.strip() == str(train_number).strip()
+        df[train_column].astype(str).str.strip()
+        == str(train_number).strip()
     ]
 
     if result.empty:
