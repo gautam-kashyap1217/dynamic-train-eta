@@ -10,6 +10,9 @@ from src.modules.station.station_routes import router as station_router
 from src.modules.congestion.congestion_routes import (
     router as congestion_router
 )
+from src.modules.signal_congestion.signal_congestion_routes import (
+    router as signal_congestion_router
+)
 
 app = FastAPI(
     title="Dynamic Train ETA Backend",
@@ -30,6 +33,7 @@ app.include_router(eta_router)
 app.include_router(simulation_router)
 app.include_router(station_router)
 app.include_router(congestion_router)
+app.include_router(signal_congestion_router)
 
 
 @app.get("/")
