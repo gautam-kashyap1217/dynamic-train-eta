@@ -1,5 +1,4 @@
 from typing import Optional
-
 from pydantic import BaseModel, Field
 
 
@@ -16,7 +15,6 @@ class ETARequest(BaseModel):
 
 
 class ETAResponse(BaseModel):
-
     # Train identification
     train_id: str
     train_number: str
@@ -26,6 +24,16 @@ class ETAResponse(BaseModel):
     next_station: str
     current_delay: float
     speed_kmph: float
+
+    # Live position details
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    distance_travelled_km: Optional[float] = None
+    timestamp: Optional[str] = None
+
+    # Data provider information
+    data_source: str = "unknown"
+    is_simulated: bool = False
 
     # ETA prediction
     eta_minutes: float

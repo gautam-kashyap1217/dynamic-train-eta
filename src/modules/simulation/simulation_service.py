@@ -5,6 +5,7 @@ from src.integrations.graph.network_graph import railway_graph
 from src.integrations.graph.spatial_extractor import spatial_extractor
 
 
+
 class SimulationService:
     """Manages simulated live train state."""
 
@@ -201,16 +202,23 @@ class SimulationService:
         self,
         train_number: str,
         interval_seconds: float = 3.0
-    ):
-        """Continuously advance a simulated train."""
-
+):
         while train_number in self.trains:
-            self.advance_train(
-                train_number,
-                elapsed_seconds=interval_seconds
+            state = self.advance_train(train_number)
+
+            print(
+                f"Simulation updated: {train_number}, "
+                f"progress={state.progress_percent}"
             )
+
+            from src.modules.eta.eta_update_manager import eta_update_manager
+
+            eta_result = eta_update_manager.update_eta(train_number)
+
+            print("ETA update result:", eta_result)
 
             await asyncio.sleep(interval_seconds)
 
+    
 
 simulation_service = SimulationService()
