@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
 from src.core.database import db
-from src.integrations.railway.railradar_client import railradar_client
 from src.modules.train.train_repository import train_repository
 
 
@@ -14,7 +13,7 @@ router = APIRouter(
 @router.get("/")
 def get_trains():
     """
-    Get all available trains.
+    Get all available trains from the local dataset.
     """
 
     df = db.get_train_details()
@@ -38,7 +37,7 @@ def get_trains():
 @router.get("/real")
 def get_real_trains():
     """
-    Get real train directory from RailRadar.
+    Get the real train directory from RailRadar.
     """
 
     try:
@@ -49,10 +48,42 @@ def get_real_trains():
             "trains": data
         }
 
-    except Exception as e:
+    except Exception as error:
         raise HTTPException(
             status_code=502,
-            detail=f"Unable to fetch real train directory: {str(e)}"
+            detail=f"Unable to fetch real train directory: {str(error)}"
+        )
+
+
+@router.get("/{train_number}/details")
+def get_train_details(train_number: str):
+    """
+    Get scheduled timetable and station details from RailRadar.
+    """
+
+    try:
+        result = train_repository.get_train_details(
+            train_number
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Train timetable not available "
+                    f"for {train_number}"
+                )
+            )
+
+        return result
+
+    except HTTPException:
+        raise
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Unable to fetch train timetable: {str(error)}"
         )
 
 
@@ -60,15 +91,22 @@ def get_real_trains():
 def get_live_train(train_number: str):
     """
     Get real-time live status of a train from RailRadar.
+
+    Supports both synthetic IDs and real train numbers.
     """
 
     try:
-        data = train_repository.get_live_train_status(train_number)
+        data = train_repository.get_live_train_status(
+            train_number
+        )
 
         if data is None:
             raise HTTPException(
                 status_code=404,
-                detail=f"Live data not available for train {train_number}"
+                detail=(
+                    f"Live data not available "
+                    f"for train {train_number}"
+                )
             )
 
         return {
@@ -79,17 +117,53 @@ def get_live_train(train_number: str):
     except HTTPException:
         raise
 
-    except Exception as e:
+    except Exception as error:
         raise HTTPException(
             status_code=502,
-            detail=f"Unable to fetch live train data: {str(e)}"
+            detail=f"Unable to fetch live train data: {str(error)}"
+        )
+
+
+@router.get("/{train_number}/live-status")
+def get_live_train_status(train_number: str):
+    """
+    Get live train status from RailRadar.
+
+    This endpoint currently returns the live response directly.
+    The frontend can use the timetable endpoint separately
+    when live movement is unavailable.
+    """
+
+    try:
+        result = train_repository.get_live_train_status(
+            train_number
+        )
+
+        if not result or not result.get("success"):
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Live status not available "
+                    f"for train {train_number}"
+                )
+            )
+
+        return result
+
+    except HTTPException:
+        raise
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch live train status: {str(error)}"
         )
 
 
 @router.get("/{train_number}")
 def get_train(train_number: str):
     """
-    Get details of a specific train.
+    Get details of a specific train from the local dataset.
     """
 
     df = db.get_train_details()
@@ -133,32 +207,3 @@ def get_train(train_number: str):
         "status": "success",
         "train": result.to_dict(orient="records")
     }
-
-
-@router.get("/{train_number}/live-status")
-def get_live_train_status(train_number: str):
-    """
-    Get live train status from RailRadar API.
-    """
-
-    try:
-        result = railradar_client.get_live_train_status(
-            train_number
-        )
-
-        if not result or not result.get("success"):
-            raise HTTPException(
-                status_code=404,
-                detail=f"Live status not available for train {train_number}"
-            )
-
-        return result
-
-    except HTTPException:
-        raise
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch live train status: {str(e)}"
-        )

@@ -18,18 +18,22 @@ def get_train_eta(train_id: str):
 
     try:
         # ---------------------------------------------------------
-        # 1. Find train mapping
+        # 1. Resolve train ID and train number
         # ---------------------------------------------------------
 
         train_info = train_service.get_train_mapping(train_id)
 
         if train_info is None:
-            raise ValueError(
-                f"No train mapping found for {train_id}"
-            )
+            # If the frontend sends an actual railway number,
+            # such as 11078, use it directly.
+            internal_train_id = str(train_id).strip()
+            train_number = str(train_id).strip()
 
-        internal_train_id = train_info["train_id"]
-        train_number = train_info["train_number"]
+        else:
+            # If the frontend sends a synthetic ID such as TRN10000,
+            # use the real train number from TRAIN_MAPPING.
+            internal_train_id = train_info["train_id"]
+            train_number = train_info["train_number"]
 
         # ---------------------------------------------------------
         # 2. Fetch actual live status from RailRadar
@@ -45,6 +49,13 @@ def get_train_eta(train_id: str):
             )
 
         live_data = live_response.get("data", {})
+
+        # Debugging output
+        print("FULL LIVE DATA:", live_data)
+
+        # ---------------------------------------------------------
+        # 3. Extract current location and next halt
+        # ---------------------------------------------------------
 
         current_location = live_data.get(
             "currentLocation",
@@ -66,6 +77,10 @@ def get_train_eta(train_id: str):
             or next_halt.get("stationName")
         )
 
+        # ---------------------------------------------------------
+        # 4. Extract current delay
+        # ---------------------------------------------------------
+
         current_delay = max(
             float(
                 current_location.get(
@@ -78,7 +93,7 @@ def get_train_eta(train_id: str):
         )
 
         # ---------------------------------------------------------
-        # 3. Validate live route information
+        # 5. Validate live route information
         # ---------------------------------------------------------
 
         if not current_station:
@@ -92,7 +107,7 @@ def get_train_eta(train_id: str):
             )
 
         # ---------------------------------------------------------
-        # 4. Prepare ETA request
+        # 6. Prepare ETA request
         # ---------------------------------------------------------
 
         request = ETARequest(
@@ -101,7 +116,7 @@ def get_train_eta(train_id: str):
         )
 
         # ---------------------------------------------------------
-        # 5. Generate ETA using the actual live segment
+        # 7. Generate ETA prediction
         # ---------------------------------------------------------
 
         result = eta_service.predict_eta(

@@ -3,12 +3,20 @@ TRAIN_MAPPING = {
         "train_number": "12002",
         "train_name": "Bhopal Shatabdi",
     },
+
     "TRN10001": {
         "train_number": "12919",
         "train_name": "Malwa Express",
     },
+
     "TRN10002": {
         "train_number": "12952",
         "train_name": "Mumbai Rajdhani",
+    },
+
+    # Jhelum Express
+    "11078": {
+        "train_number": "11078",
+        "train_name": "Jhelum Express",
     },
 }

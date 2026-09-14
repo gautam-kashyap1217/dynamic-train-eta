@@ -1,4 +1,3 @@
-
 import React from "react";
 
 import {
@@ -40,7 +39,7 @@ const LiveStats = ({ live }) => {
     {
       label: "Estimated Speed",
       value: `${live.speed} km/h`,
-      sub: "Based on estimated segment speed",
+      sub: "Prototype estimated segment speed",
       icon: Gauge,
     },
     {

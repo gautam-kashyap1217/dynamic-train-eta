@@ -1,9 +1,10 @@
-
 from datetime import datetime, timedelta
 
 from src.modules.eta.eta_schemas import ETARequest, ETAResponse
 from src.modules.eta.eta_repository import eta_repository
 from src.modules.train.train_service import train_service
+
+from src.modules.weather.weather_service import weather_service
 
 from src.integrations.railway.railradar_client import railradar_client
 from src.integrations.ml.feature_pipeline import FeaturePipeline
@@ -11,13 +12,22 @@ from src.integrations.ml.inference_engine import inference_engine
 
 
 class ETAService:
-    """Generates ETA predictions using graph data and ML models."""
+    """Generates ETA predictions using graph data, weather data, and ML models."""
 
     # Temporary values used when the live railway segment is not
     # available in the local graph dataset.
     FALLBACK_DISTANCE_KM = 10.0
     FALLBACK_SPEED_KMPH = 50.0
     FALLBACK_CONGESTION = 0.5
+
+    # Default weather values used if weather retrieval fails.
+    DEFAULT_WEATHER = {
+        "condition": "Clear",
+        "visibility_km": 10.0,
+        "rainfall_mm": 0.0,
+        "temperature_c": 25.0,
+        "humidity_percent": 60.0,
+    }
 
     def __init__(self):
         self.feature_pipeline = FeaturePipeline(
@@ -63,6 +73,36 @@ class ETAService:
         }
 
         return fallback_segment, True
+
+    def _get_weather_data(self, current_station: str):
+        """
+        Get weather data for the current station.
+
+        The current implementation uses the local/mock weather service.
+        If weather retrieval fails, default weather values are returned.
+        """
+
+        try:
+            weather = weather_service.get_weather(
+                current_station
+            )
+
+            return {
+                "condition": weather.condition,
+                "visibility_km": weather.visibility_km,
+                "rainfall_mm": weather.rainfall_mm,
+                "temperature_c": weather.temperature_c,
+                "humidity_percent": weather.humidity_percent,
+            }
+
+        except Exception as error:
+            print(
+                "Weather retrieval failed. "
+                "Using default weather values:",
+                error
+            )
+
+            return self.DEFAULT_WEATHER.copy()
 
     def predict_eta(
         self,
@@ -134,6 +174,11 @@ class ETAService:
 
         train_number = train_info["train_number"]
 
+        # Get local/mock weather data for the current station.
+        weather_data = self._get_weather_data(
+            current_station
+        )
+
         # Route data is useful for future map-based improvements.
         # ETA generation should continue even if this request fails.
         try:
@@ -175,19 +220,36 @@ class ETAService:
             "current_station": current_station,
             "next_station": next_station,
             "distance_to_next_station_km": distance_km,
+
             "current_speed_kmph": speed_kmph,
             "speed_kmph": speed_kmph,
             "scheduled_speed_kmph": speed_kmph,
             "section_average_speed_kmph": speed_kmph,
+
             "current_delay_min": effective_delay,
             "delay_min": effective_delay,
+
             "baseline_eta_min": graph_eta_minutes,
             "scheduled_travel_time_min": graph_eta_minutes,
+
             "route_segment_id": route_segment_id,
             "route_segment_id_network": route_segment_id,
             "geo_distance_to_next_km": distance_km,
+
             "track_congestion": congestion,
+
+            # Weather features
+            "weather": weather_data["condition"],
+            "visibility_km": weather_data["visibility_km"],
+            "rainfall_mm": weather_data["rainfall_mm"],
+            "temperature_c": weather_data["temperature_c"],
+            "humidity_percent": weather_data["humidity_percent"],
         }
+
+        print(
+            "Weather data used for ETA:",
+            weather_data
+        )
 
         features_df = self.feature_pipeline.build_features(
             raw_data
