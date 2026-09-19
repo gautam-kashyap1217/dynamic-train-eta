@@ -14,6 +14,22 @@ TRAIN_MAPPING = {
         "train_name": "Mumbai Rajdhani",
     },
 
+    # Direct train-number lookups
+    "12002": {
+        "train_number": "12002",
+        "train_name": "Bhopal Shatabdi",
+    },
+
+    "12919": {
+        "train_number": "12919",
+        "train_name": "Malwa Express",
+    },
+
+    "12952": {
+        "train_number": "12952",
+        "train_name": "Mumbai Rajdhani",
+    },
+
     # Jhelum Express
     "11078": {
         "train_number": "11078",
